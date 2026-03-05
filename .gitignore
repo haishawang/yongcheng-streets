@@ -1,0 +1,45 @@
+# === 依赖和构建产物 ===
+node_modules/
+dist/
+build/
+*.log
+*.tmp
+
+# === 缓存文件 ===
+.cache/
+webpack/
+.cache-loader/
+
+# === 微信会话数据 ===
+wechat-session/
+WeChat Files/
+
+# === 媒体文件 ===
+*.mp4
+*.mp3
+*.avi
+*.mov
+*.zip
+*.rar
+*.7z
+
+# === IDE 配置 ===
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# === 系统文件 ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === 环境变量 ===
+.env
+.env.local
+.env.*.local
+
+# === 临时文件 ===
+nul
+*.temp
+*.bak
