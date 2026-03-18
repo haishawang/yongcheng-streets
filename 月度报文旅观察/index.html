@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>甬城街巷志 · 宁波历史文化知识库</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+        :root {
+            --ink-black: #2c2416;
+            --ink-light: #5a4d3a;
+            --parchment: #e8dcc8;
+            --parchment-light: #f0e6d4;
+            --parchment-dark: #d4c4a8;
+            --parchment-shadow: #c4b498;
+            --cinnabar: #8b2323;
+            --indigo: #1e3a5f;
+            --gold: #8b6914;
+            --jade: #2d5a3d;
+            --border-color: #b8a890;
+            --accent-line: #8b2323;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+            background-color: var(--parchment);
+            background-image:
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139,105,20,0.03) 2px, rgba(139,105,20,0.03) 4px),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,105,20,0.02) 2px, rgba(139,105,20,0.02) 4px);
+            color: var(--ink-black);
+            min-height: 100vh;
+        }
+
+        /* 羊皮纸纹理效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(139,105,20,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(139,105,20,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, rgba(139,105,20,0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 固定顶部容器 */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+            border-bottom: 3px double var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 书卷标题 */
+        .scroll-header {
+            text-align: center;
+            padding: 15px 20px 10px;
+            position: relative;
+        }
+
+        .scroll-header::before,
+        .scroll-header::after {
+            content: '❦';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 1em;
+            opacity: 0.6;
+        }
+        .scroll-header::before { left: 15%; }
+        .scroll-header::after { right: 15%; }
+
+        .header-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--cinnabar);
+            letter-spacing: 0.3em;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .header-subtitle {
+            font-size: 0.8em;
+            color: var(--indigo);
+            letter-spacing: 0.1em;
+        }
+
+        /* 导航 */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            padding: 8px 10px 0;
+            background: transparent;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar { display: none; }
+
+        .nav-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9em;
+            color: var(--ink-light);
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            position: relative;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-tab:hover { color: var(--indigo); }
+
+        .nav-tab.active {
+            color: var(--cinnabar);
+            border-bottom-color: var(--cinnabar);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid var(--cinnabar);
+        }
+
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 101;
+            width: 40px;
+            height: 40px;
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 主内容区 */
+        .main-container {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding-top: 130px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 左侧 */
+        .left-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 15px;
+            position: fixed;
+            top: 130px;
+            bottom: 0;
+            left: calc((100vw - 1600px) / 2);
+            overflow-y: auto;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 1600px) {
+            .left-sidebar { left: 0; }
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 35px;
+            border: 1px solid var(--border-color);
+            background: var(--parchment-light);
+            font-family: inherit;
+            font-size: 0.9em;
+            color: var(--ink-black);
+            border-radius: 4px;
+        }
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 0.9em;
+        }
+
+        /* 树形菜单 */
+        .tree-section { margin-bottom: 8px; }
+
+        .tree-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 8px;
+            background: linear-gradient(90deg, rgba(139,105,20,0.1), transparent);
+            border-left: 3px solid var(--gold);
+            cursor: pointer;
+            margin-bottom: 4px;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.2s;
+        }
+        .tree-header:hover {
+            background: linear-gradient(90deg, rgba(139,105,20,0.2), transparent);
+        }
+
+        .tree-icon { width: 20px; margin-right: 6px; text-align: center; font-size: 0.9em; }
+        .tree-title { flex: 1; font-weight: 600; font-size: 0.9em; }
+        .tree-count {
+            font-size: 0.7em;
+            color: var(--gold);
+            background: rgba(139,105,20,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        .tree-arrow { margin-left: 6px; transition: transform 0.3s; font-size: 0.75em; }
+        .tree-header.expanded .tree-arrow { transform: rotate(90deg); }
+
+        .tree-children { display: none; padding-left: 12px; border-left: 1px dashed var(--border-color); margin-left: 8px; }
+        .tree-children.expanded { display: block; }
+
+        .tree-item {
+            padding: 8px 10px;
+            margin: 3px 0;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.2s;
+        }
+        .tree-item:hover {
+            background: rgba(30,58,95,0.08);
+            border-left-color: var(--indigo);
+        }
+        .tree-item.selected {
+            background: rgba(139,34,35,0.1);
+            border-left-color: var(--cinnabar);
+            color: var(--cinnabar);
+        }
+
+        /* 中间 */
+        .center-content {
+            flex: 1;
+            margin-left: 280px;
+            margin-right: 260px;
+            padding: 25px 40px 40px;
+            min-height: calc(100vh - 130px);
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+        .chapter-header::after {
+            content: '❧';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--parchment);
+            padding: 0 15px;
+            color: var(--gold);
+            font-size: 1.1em;
+        }
+
+        .chapter-number {
+            font-size: 0.8em;
+            color: var(--gold);
+            letter-spacing: 0.2em;
+            margin-bottom: 10px;
+        }
+        .chapter-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            color: var(--ink-black);
+        }
+        .chapter-subtitle {
+            font-size: 0.95em;
+            color: var(--ink-light);
+            font-style: italic;
+            letter-spacing: 0.08em;
+        }
+
+        .content-body {
+            line-height: 2;
+            text-align: justify;
+            font-size: 1em;
+            text-indent: 2em;
+        }
+        .content-body p {
+            margin-bottom: 1.2em;
+        }
+
+        /* 古籍样式引用 */
+        .classical-quote {
+            background: linear-gradient(135deg, rgba(139,105,20,0.08) 0%, transparent 100%);
+            border-left: 4px solid var(--gold);
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--ink-light);
+            position: relative;
+            text-indent: 0;
+        }
+        .classical-quote::before {
+            content: '"';
+            font-size: 2.5em;
+            position: absolute;
+            top: -5px;
+            left: 8px;
+            color: var(--gold);
+            opacity: 0.3;
+        }
+
+        /* 卡片 */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .info-card {
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border-color);
+        }
+        .info-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .info-card.street::before { background: var(--indigo); }
+        .info-card.building::before { background: var(--gold); }
+        .info-card.figure::before { background: var(--cinnabar); }
+        .info-card.event::before { background: var(--jade); }
+
+        .info-card-title {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .info-card-content {
+            font-size: 0.85em;
+            color: var(--ink-light);
+            line-height: 1.7;
+            text-indent: 0;
+        }
+
+        /* 首页特殊 */
+        .home-content { padding: 15px 0; }
+        .home-intro {
+            text-align: center;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, rgba(139,105,20,0.05) 0%, transparent 100%);
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .home-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--cinnabar);
+            margin-bottom: 20px;
+            letter-spacing: 0.15em;
+        }
+        .home-desc {
+            font-size: 0.95em;
+            color: var(--ink-light);
+            line-height: 2;
+            max-width: 700px;
+            margin: 0 auto;
+            text-indent: 2em;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .category-card {
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            padding: 20px 15px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .category-card:hover {
+            border-color: var(--indigo);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        .category-icon { font-size: 1.8em; margin-bottom: 10px; }
+        .category-name { font-size: 1em; font-weight: 600; margin-bottom: 6px; }
+        .category-count { font-size: 0.8em; color: var(--gold); }
+
+        /* 区域分类卡片 */
+        .region-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        .region-section h3 {
+            color: var(--indigo);
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .region-section p {
+            text-indent: 0;
+            color: var(--ink-light);
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+        .region-streets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .region-street-tag {
+            padding: 4px 10px;
+            background: rgba(30,58,95,0.1);
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: var(--indigo);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .region-street-tag:hover {
+            background: rgba(30,58,95,0.2);
+        }
+
+        /* 时间轴 */
+        .timeline { padding: 15px 0; }
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 85px;
+            top: 0;
+            bottom: -20px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--border-color), transparent);
+        }
+        .timeline-date {
+            width: 75px;
+            text-align: right;
+            padding-right: 15px;
+            color: var(--cinnabar);
+            font-weight: 600;
+            flex-shrink: 0;
+            font-size: 0.9em;
+        }
+        .timeline-date .dynasty {
+            font-size: 0.75em;
+            color: var(--ink-light);
+            font-weight: normal;
+        }
+        .timeline-content {
+            flex: 1;
+            padding: 15px;
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-left: 12px;
+            position: relative;
+        }
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-right: 7px solid var(--border-color);
+        }
+        .timeline-title { font-weight: 600; margin-bottom: 6px; color: var(--indigo); font-size: 0.95em; }
+        .timeline-desc { color: var(--ink-light); font-size: 0.9em; line-height: 1.7; text-indent: 0; }
+
+        /* 人物卡片 */
+        .figure-card {
+            display: flex;
+            gap: 18px;
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .figure-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .figure-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--indigo), #3a5a7f);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: var(--parchment-light);
+            flex-shrink: 0;
+            border: 2px solid var(--border-color);
+        }
+        .figure-info h4 { font-size: 1.1em; color: var(--cinnabar); margin-bottom: 6px; }
+        .figure-dynasty { display: inline-block; padding: 3px 10px; background: rgba(139,34,35,0.1); color: var(--cinnabar); font-size: 0.75em; border-radius: 4px; margin-bottom: 8px; }
+        .figure-desc { color: var(--ink-light); line-height: 1.7; text-indent: 0; font-size: 0.9em; }
+
+        /* 街巷详情 */
+        .detail-section {
+            background: var(--parchment-light);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .detail-section h4 {
+            color: var(--indigo);
+            font-size: 1em;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .detail-section p {
+            text-indent: 2em;
+            margin-bottom: 10px;
+            color: var(--ink-light);
+            font-size: 0.95em;
+        }
+
+        /* 右侧 */
+        .right-sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+            border-left: 1px solid var(--border-color);
+            padding: 20px 15px;
+            position: fixed;
+            top: 130px;
+            bottom: 0;
+            right: calc((100vw - 1600px) / 2);
+            overflow-y: auto;
+            z-index: 50;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 1600px) {
+            .right-sidebar { right: 0; }
+        }
+
+        .sidebar-section { margin-bottom: 25px; }
+        .sidebar-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--indigo);
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sidebar-content {
+            font-size: 0.85em;
+            line-height: 1.8;
+            color: var(--ink-light);
+        }
+
+        .quick-links { list-style: none; }
+        .quick-links li {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        .quick-links li:hover { color: var(--cinnabar); padding-left: 4px; }
+        .link-tag {
+            font-size: 0.65em;
+            padding: 2px 6px;
+            background: rgba(30,58,95,0.1);
+            color: var(--indigo);
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        /* 页码样式 */
+        .page-reference {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            color: var(--ink-light);
+            font-size: 0.8em;
+        }
+
+        /* 底部 */
+        .footer {
+            text-align: center;
+            padding: 25px 20px;
+            background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8em;
+            color: var(--ink-light);
+            margin-left: 280px;
+            margin-right: 260px;
+        }
+
+        /* 卷轴装饰 */
+        .scroll-decoration {
+            text-align: center;
+            margin: 25px 0;
+            color: var(--border-color);
+            letter-spacing: 0.8em;
+        }
+
+        /* 遮罩层 */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 49;
+        }
+
+        /* ============ 移动端适配 ============ */
+        @media (max-width: 1024px) {
+            .left-sidebar { width: 260px; }
+            .right-sidebar { width: 240px; }
+            .center-content {
+                margin-left: 260px;
+                margin-right: 240px;
+                padding: 20px 25px 30px;
+            }
+            .footer {
+                margin-left: 260px;
+                margin-right: 240px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            /* 隐藏左右侧边栏，显示菜单按钮 */
+            .menu-toggle { display: block; }
+
+            .left-sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                top: 0;
+                z-index: 60;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            }
+            .left-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .right-sidebar {
+                display: none;
+            }
+
+            .center-content {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+                min-height: calc(100vh - 120px);
+            }
+
+            .footer {
+                margin-left: 0;
+                margin-right: 0;
+                padding: 20px;
+            }
+
+            /* 调整标题大小 */
+            .header-title {
+                font-size: 1.4em;
+                letter-spacing: 0.2em;
+            }
+            .header-subtitle {
+                font-size: 0.75em;
+            }
+            .scroll-header {
+                padding: 12px 15px 8px;
+            }
+            .scroll-header::before,
+            .scroll-header::after {
+                display: none;
+            }
+
+            /* 导航调整 */
+            .nav-tabs {
+                padding: 6px 5px 0;
+            }
+            .nav-tab {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+
+            .main-container {
+                padding-top: 110px;
+            }
+
+            /* 首页调整 */
+            .home-intro {
+                padding: 20px 15px;
+            }
+            .home-title {
+                font-size: 1.3em;
+            }
+            .home-desc {
+                font-size: 0.9em;
+                line-height: 1.8;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .category-card {
+                padding: 15px 10px;
+            }
+            .category-icon {
+                font-size: 1.5em;
+            }
+            .category-name {
+                font-size: 0.9em;
+            }
+            .category-count {
+                font-size: 0.75em;
+            }
+
+            /* 卡片调整 */
+            .info-cards {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .info-card {
+                padding: 12px;
+            }
+
+            /* 章节标题调整 */
+            .chapter-title {
+                font-size: 1.5em;
+            }
+            .chapter-subtitle {
+                font-size: 0.9em;
+            }
+
+            /* 详情区域调整 */
+            .detail-section {
+                padding: 15px;
+            }
+
+            /* 人物卡片调整 */
+            .figure-card {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px;
+            }
+            .figure-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+                margin: 0 auto;
+            }
+            .figure-info {
+                text-align: center;
+            }
+
+            /* 时间轴调整 */
+            .timeline-item::before {
+                left: 70px;
+            }
+            .timeline-date {
+                width: 65px;
+                font-size: 0.85em;
+            }
+            .timeline-content {
+                padding: 12px;
+                margin-left: 10px;
+            }
+
+            /* 区域分类调整 */
+            .region-section {
+                padding: 15px;
+            }
+            .region-streets {
+                gap: 6px;
+            }
+            .region-street-tag {
+                padding: 3px 8px;
+                font-size: 0.75em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.2em;
+                letter-spacing: 0.15em;
+            }
+            .header-subtitle {
+                font-size: 0.7em;
+            }
+
+            .nav-tab {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+
+            .center-content {
+                padding: 15px;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .chapter-title {
+                font-size: 1.3em;
+            }
+
+            .content-body {
+                font-size: 0.95em;
+                line-height: 1.8;
+            }
+
+            .detail-section p {
+                text-indent: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sticky-header">
+        <header class="scroll-header">
+            <h1 class="header-title">甬城街巷志</h1>
+            <p class="header-subtitle">宁波历史文化名城街巷典籍 · 基于《甬城街巷》整理</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="home">总览</button>
+            <button class="nav-tab" data-tab="streets">街巷考</button>
+            <button class="nav-tab" data-tab="buildings">建筑志</button>
+            <button class="nav-tab" data-tab="figures">人物传</button>
+            <button class="nav-tab" data-tab="timeline">编年史</button>
+        </nav>
+    </div>
+
+    <div class="main-container">
+        <aside class="left-sidebar" id="leftSidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="检索街巷、人物、建筑...">
+            </div>
+            <div class="tree-menu" id="treeMenu"></div>
+        </aside>
+
+        <main class="center-content" id="mainContent">
+            <p style="text-align:center;color:#888;padding:50px;">加载中...</p>
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📜 每日典读</h3>
+                <div class="sidebar-content">
+                    <p style="text-indent:0;margin-bottom:10px;"><strong>苍水街</strong></p>
+                    <p>位于海曙区，以明末抗清英雄张苍水命名。张苍水（1620-1664），名煌言，字玄著，浙江鄞县人，南明兵部尚书，坚持抗清十九年，被俘后宁死不屈，英勇就义。</p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">🔗 快速导航</h3>
+                <ul class="quick-links">
+                    <li onclick="showStreetDetail('苍水街', '海曙区')">📍 苍水街 <span class="link-tag">街巷</span></li>
+                    <li onclick="showStreetDetail('中山路', '海曙区')">📍 中山路 <span class="link-tag">街巷</span></li>
+                    <li onclick="showStreetDetail('柳汀街', '月湖区域')">📍 柳汀街 <span class="link-tag">街巷</span></li>
+                    <li onclick="showBuildingDetail('天一阁')">🏛️ 天一阁 <span class="link-tag">建筑</span></li>
+                    <li onclick="showBuildingDetail('天封塔')">🏛️ 天封塔 <span class="link-tag">建筑</span></li>
+                    <li onclick="showFigureDetail('张苍水')">👤 张苍水 <span class="link-tag">人物</span></li>
+                    <li onclick="showFigureDetail('范钦')">👤 范钦 <span class="link-tag">人物</span></li>
+                    <li onclick="showFigureDetail('王安石')">👤 王安石 <span class="link-tag">人物</span></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">📖 阅读指南</h3>
+                <div class="sidebar-content">
+                    <p>本书分为四卷：街巷考录宁波城中四十余条历史街巷之来历与变迁；建筑志记载十八处古建名胜；人物传述十余位与甬城相关的历史人物；编年史梳理千年沿革。</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="footer">
+        <p>甬城街巷志 · 宁波历史文化名城数字化知识库</p>
+        <p style="margin-top:8px;">基于《甬城街巷》（傅建忠 著）整理</p>
+    </footer>
+
+    <script>
+        // 知识库数据
+        var knowledgeBase = {
+            regions: {
+                "海曙区": {
+                    icon: "🏛️",
+                    desc: "宁波老城区核心，历史最为悠久。中山路、江厦街等商贾云集，见证了宁波的商业繁荣；苍水街、郎官巷等人文荟萃，体现了宁波的文化底蕴。",
+                    streets: [
+                        { name: "苍水街", desc: "以明末抗清英雄张苍水命名，纪念其宁死不屈之精神", pages: "34-38", highlight: true, detail: "苍水街位于海曙区中心地带，是宁波老城区的重要街道之一。街名源自明末抗清英雄张苍水（1620-1664），名煌言，字玄著，浙江鄞县人。张苍水官至南明兵部尚书，坚持抗清斗争十九年，被俘后宁死不屈，英勇就义。街道两旁保留着明清时期的建筑风格，青石板路、马头墙、天井院落，尽显江南古韵。", history: "清乾隆年间始称苍水街，以纪念明末抗清英雄张苍水。民国时期曾改名为中山路一段，1949年后恢复原名。20世纪90年代进行道路拓宽改造，但保留了原有街巷格局和部分历史建筑。", location: "位于海曙区中心，东接解放路，西连望京路，南邻中山路，北靠后大街。地处宁波老城区核心地带，周边有鼓楼、中山公园等重要地标。", value: "苍水街是宁波爱国主义教育的重要场所，街名本身即是对英雄精神的纪念。街道保留的清代民居和传统街巷格局，是研究宁波老城风貌的珍贵实物资料。2010年，苍水街被列入宁波历史文化街区保护名录。" },
+                        { name: "中山路", desc: "宁波商业主街，商战之地，见证百年商业风云", pages: "250-253", detail: "中山路是宁波最具代表性的商业街道，自清末以来就是商贾云集之地。街道宽阔笔直，两旁商铺林立，曾有'十里长街'之美誉。民国时期，这里曾是宁波商帮的重要活动场所，见证了无数商业传奇。", history: "中山路始建于清末，是宁波近代城市规划的产物。1927年拓建为柏油马路，成为宁波第一条现代化商业街。民国时期，中国银行、交通银行等重要金融机构在此设立分行，被誉为'宁波的华尔街'。抗战时期遭受严重破坏，战后重建。20世纪80年代后逐步改造为步行街和商业中心。", location: "横贯海曙区东西，东起江厦街，西至望京路，全长逾千米。为宁波老城区主干道，与解放路、开明街等南北向街道交汇，形成网格状交通体系。", value: "中山路是宁波商业发展的缩影，见证了从传统商铺到现代商业中心的演变。街道两旁保留的近代银行建筑和商业骑楼，是研究宁波近代商业史和建筑史的重要实例。现为宁波最繁华的商业中心之一。" },
+                        { name: "江厦街", desc: "昔日商业中心，因江厦庙而得名", pages: "254-261", detail: "江厦街因江厦庙而得名，历史上是宁波重要的商业集散地。明清时期，这里店铺林立，商贾往来，是宁波最繁华的商业区之一。街道保留了传统的骑楼建筑，具有浓郁的南洋风情。", history: "江厦街因南宋时建的江厦庙而得名。明清时期为宁波最繁华的商业中心，'江厦街市'为宁波八景之一。1844年宁波开埠后，成为对外贸易的重要集散地。民国时期，这里是钱庄、银号聚集之地，有'宁波华尔街'之称。1966年更名为东方红大街，1981年恢复原名。", location: "位于海曙区东部，北濒甬江，南接中山路，是宁波老城区通往江北的重要通道。东临三江口，西连开明街，地理位置得天独厚，自古为商贸繁华之地。", value: "江厦街是宁波开埠通商的历史见证，保留的骑楼建筑群是宁波近代商业建筑的代表。街道见证了宁波从传统商埠向近代港口城市的转型，具有重要的历史研究价值。现为宁波三江口商业区的核心组成部分。" },
+                        { name: "药行街", desc: "药业聚集地，曾是浙东药材集散中心", pages: "262-269", detail: "药行街因历史上聚集众多药行而得名，曾是浙东地区重要的药材集散地。清末民初，这里药铺林立，名医云集，形成了独特的药文化。街道两旁的老字号药铺至今仍有遗存。", history: "药行街形成于明代，因药业聚集而得名。清代至民国时期达到鼎盛，有'浙东药都'之称。著名药号如同仁堂、胡庆余堂等均在此设有分号。民国时期，这里还是中医名家云集之地，形成了独特的药市文化。1958年公私合营后，大部分药号合并为国有药店。", location: "位于海曙区中部偏东，东起江厦街，西至开明街，全长约500米。地处老城区商业区，与中山路、灵桥路等商业要道相邻，历史上为药材集散重地。", value: "药行街是浙东中医药文化的重要载体，见证了宁波药业从传统到现代的发展历程。街道保留的药铺建筑和相关文献资料，对研究江南药业史和中医药文化具有重要价值。现为宁波传统医药文化展示街区。" },
+                        { name: "灵桥路", desc: "灵桥护佑的街道，见证宁波近代化进程", pages: "270-279", detail: "灵桥路因灵桥而得名，是连接宁波老城区与江东区的重要通道。灵桥始建于唐代，原名东津浮桥，是宁波的地标性建筑。街道见证了宁波从传统商埠向近代城市转型的历史进程。", history: "灵桥路开辟于1936年，因同年建成的灵桥钢桥而得名。该桥由德国西门子洋行承建，是宁波第一座现代化钢桥，也是当时中国最先进的桥梁之一。建桥前此处为渡口，仅靠小舟往来。灵桥的建成大大便利了鄞江两岸交通，促进了江东地区的发展。抗战期间灵桥被日军炸毁，1946年修复。", location: "位于海曙区东南部，东起灵桥，西至开明街，是连接老城区与江东区的咽喉要道。路南端为奉化江，灵桥横跨江上，是宁波重要的交通枢纽。", value: "灵桥路是宁波近代城市规划和交通建设的标志性街道。灵桥钢桥是中国近代桥梁史上的重要实例，具有极高的工程技术价值和历史价值。街道见证了宁波从'甬城'向现代港口城市转型的关键历程，是宁波近代化进程的缩影。" }
+                    ]
+                },
+                "月湖区域": {
+                    icon: "🌊",
+                    desc: "浙东邹鲁，人文荟萃之地。天一阁藏书天下闻名，柳汀街、翰香坊等街巷书香门第聚集，人文气息浓厚。",
+                    streets: [
+                        { name: "柳汀街", desc: "月湖畔双桥相拥的街道，风景如画", pages: "122-127", highlight: true, detail: "柳汀街位于月湖畔，因街旁柳树成荫、小汀环绕而得名。街道最负盛名的是月湖双桥——陆公桥与水月桥，两桥相望，相映成趣。这里是宁波文化名流的聚集之地，历史上众多文人墨客在此吟诗作画。", history: "柳汀街历史可追溯至南宋，因湖畔柳树成荫而得名。明代为月湖十洲之一的柳洲所在地。清代形成街道，成为连接月湖与城内的重要通道。1934年铺设石板路，1962年改建为水泥路面。街旁的陆公桥始建于南宋，水月桥建于明代，两桥均为宁波市级文物保护单位。", location: "位于月湖西南岸，东起镇明路，西至长春路，全长约600米。街南侧为月湖，与柳汀岛、花屿等月湖十洲相望，是月湖景区的核心街道。", value: "柳汀街是月湖风景区的重要组成部分，保留的陆公桥、水月桥是宁波古桥梁建筑的精品。街道两旁的传统建筑和湖景相映成趣，是宁波最具诗意的历史文化街区之一。现为月湖景区旅游观光的重要线路。" },
+                        { name: "桂花巷", desc: "因桂花飘香而得名的幽静巷弄", pages: "54-61", detail: "桂花巷是一条幽静的小巷，因旧时巷内多植桂花树而得名。每到秋季，桂花飘香，沁人心脾。巷内保留着典型的江南民居建筑，白墙黛瓦，古朴典雅。", history: "桂花巷形成于清代中期，因巷内居民喜植桂花而得名。旧时为月湖周边居民的住宅区，多为文人、商贾宅邸。巷内有保存完好的清代民居数座，其中桂花巷5号民居被列为宁波历史建筑。民国时期，这里曾是宁波文化界人士聚会之所。", location: "位于月湖东北侧，北接苍水街，南连月湖西岸，是一条长约200米的南北向小巷。地处月湖与老城区交界处，环境清幽，闹中取静。", value: "桂花巷是宁波传统民居巷弄的典型代表，保留的清代建筑展现了江南民居的建筑特色。巷内至今仍有桂花树多株，每年秋季桂花盛开，香气四溢，成为月湖周边一道独特的风景线。" },
+                        { name: "永寿巷", desc: "承载古老故事的巷弄", pages: "62-69", detail: "永寿巷历史悠久，巷名寓意吉祥长寿。巷内保存着多座明清时期的建筑，有着深厚的历史底蕴。相传巷内曾出过一位百岁老人，因此得名永寿。", history: "永寿巷原名永安巷，明代改称今名，取'永年长寿'之意。巷内有永寿庵，建于明万历年间，为巷名来源之一。清代为月湖周边重要的居民区，巷内建筑多为清代中晚期所建。20世纪80年代，巷内部分建筑进行了修缮，保留了原有的街巷格局。", location: "位于月湖东南岸，东起镇明路，西接月湖，呈东西走向。巷南侧为月湖公园，北侧与翰香坊相邻，是月湖文化圈的重要组成部分。", value: "永寿巷是月湖历史文化街区的重要组成部分，保留的明清建筑和传统街巷格局，是研究宁波老城民居和街巷文化的珍贵实例。巷内永寿庵遗址是研究宁波民间宗教文化的重要实物资料。" },
+                        { name: "翰香坊", desc: "书香门第聚集之地，文化氛围浓厚", pages: "70-77", detail: "翰香坊因历史上书香门第聚集而得名，是宁波文化底蕴最深厚的街区之一。明清时期，这里曾是文人雅士的聚集之地，翰墨飘香，诗书传家。", history: "翰香坊始建于明代，因巷内有多座私塾、书院而得名。清代为宁波科举世家聚集之地，出过进士、举人十余人。巷内曾有'翰墨林'书坊，为清代宁波四大书坊之一。民国时期，这里仍是宁波教育界、文化界人士居住之地，被誉为'甬上文脉'。", location: "位于月湖东侧，北起苍水街，南至柳汀街，呈南北走向。巷东侧为镇明路，西侧紧邻月湖，与天一阁隔湖相望，是月湖文化气息最浓厚的街区之一。", value: "翰香坊是宁波'浙东邹鲁'文化传统的实物见证，历史上科举世家聚集，文人辈出。巷名本身即是对崇文重教传统的纪念。现为月湖文化展示区的核心组成部分，是体验宁波传统文化的重要场所。" },
+                        { name: "郎官巷", desc: "双状元荣耀，人文荟萃", pages: "346-355", highlight: true, detail: "郎官巷是宁波最著名的文化街巷之一，历史上出过两位状元，被誉为'双状元巷'。巷内保留着多座名人故居，人文气息浓厚，是宁波'浙东邹鲁'美誉的缩影。", history: "郎官巷因南宋状元、吏部侍郎袁甫而得名，'郎官'为吏部官员的雅称。南宋绍定年间，袁甫中状元后居此，巷因此得名。明代又有状元张时彻居此，故有'双状元巷'之称。清代为宁波士大夫聚居区，巷内有'三世尚书'牌坊遗址。现存建筑多为清代晚期至民国时期所建。", location: "位于月湖西北侧，东接月湖西岸，西连望京路，是一条东西走向的小巷。巷北邻天一阁，南接柳汀街，地处月湖文化核心区，与众多历史文化遗迹相邻。", value: "郎官巷是宁波科举文化的象征，'双状元'的荣耀体现了宁波深厚的文化底蕴。巷内保留的名人故居和传统建筑，是研究宁波科举史和士大夫文化的重要实例。与天一阁相邻，共同构成月湖文化核心区域。" }
+                    ]
+                }
+            },
+            buildings: [
+                { name: "天一阁", type: "藏书楼", dynasty: "明代", year: "1561年", location: "月湖", locationDetail: "位于月湖西岸，占地约2.6万平方米，建筑群坐北朝南，背依月湖，面临宝书楼。东邻月湖十洲中的花屿、柳汀，西接长春路，与镇明路相望。", desc: "中国现存最古老的私家藏书楼，亚洲最古老的图书馆", detail: "天一阁位于月湖西岸，建于明嘉靖四十年（1561年），由兵部右侍郎范钦创建。天一阁是中国现存最古老的私家藏书楼，也是亚洲最古老的图书馆，世界最早的三大家族图书馆之一。", value: "天一阁藏书丰富，以明代地方志和科举录最为珍贵。阁名取'天一生水'之意，以防火患。其独特的建筑形制——'天一地六'的布局，对后世藏书楼建筑影响深远。现为全国重点文物保护单位，国家AAAA级旅游景区，是宁波乃至中国文化的标志性建筑。" },
+                { name: "天封塔", type: "古塔", dynasty: "唐代", year: "695年", location: "大沙泥街", locationDetail: "位于海曙区大沙泥街与开明街交汇处，地处宁波老城区中心地带。塔院占地面积约2000平方米，塔高51.5米，为宁波老城区制高点之一。", desc: "宁波标志性建筑，六角形砖塔，城市地标", detail: "天封塔始建于唐武则天年间（695年），为保存佛舍利而建。塔为六角形砖塔，高约50米，共14层，是宁波的标志性建筑。", value: "天封塔是宁波城市历史的见证，历经1300余年，屡毁屡建。现存塔为1980年代重建，但仍保持唐代风格。塔内供奉的佛舍利和历代文物，具有极高的宗教价值和艺术价值。作为宁波的地标，天封塔已成为城市的象征，'天封塔影'为宁波十景之一。" },
+                { name: "灵桥", type: "桥梁", dynasty: "唐代", year: "823年", location: "灵桥路", locationDetail: "横跨奉化江，连接海曙区与江东区，是宁波三江口的重要交通枢纽。桥长97.6米，宽20米，为钢桁架结构，是宁波历史上第一座现代化钢桥。", desc: "宁波地标，原名东津浮桥，连接鄞奉", detail: "灵桥始建于唐长庆年间（823年），原址为浮桥，原名东津浮桥。1936年建成钢桥，由德国工程师设计，是当时中国最先进的桥梁之一。", value: "灵桥是中国近代桥梁史上的杰作，由德国西门子洋行承建，采用当时最先进的钢结构技术。桥梁设计合理，结构坚固，虽历经抗战炮火和多次洪水冲击，仍屹立不倒。灵桥是宁波近代化的标志，也是中德技术合作的见证。现为宁波市级文物保护单位。" },
+                { name: "鼓楼", type: "城楼", dynasty: "唐代", year: "821年", location: "中山路", locationDetail: "位于海曙区中山路和中山西路交汇处，是宁波老城区的地理中心。城楼高约20米，占地面积约700平方米，为宁波子城仅存的城市防御建筑。", desc: "宁波古城标志，子城城门遗址", detail: "鼓楼是宁波古城的子城城门，始建于唐长庆元年（821年），是宁波建城的标志。鼓楼历经多次毁建，现存建筑为清代重建。", value: "鼓楼是宁波建城历史的见证，始建于821年，距今已有1200年历史。作为子城城门，鼓楼曾是宁波的政治中心。现存城楼为清代咸丰年间重建，建筑风格独特，钟鼓楼合一，在全国较为罕见。现为宁波市级文物保护单位，是宁波城市历史的活化石。" },
+                { name: "七塔寺", type: "寺院", dynasty: "唐代", year: "858年", location: "百丈路", locationDetail: "位于江东区百丈路183号，占地面积约1.5万平方米。寺院坐北朝南，依山而建，山门面临百丈路，后山与城东公园相连，环境清幽。", desc: "浙东四大丛林之一，佛教名刹", detail: "七塔寺始建于唐大中十二年（858年），是浙东四大丛林之一。寺内原有七座佛塔，故名七塔寺。", value: "七塔寺是浙东佛教的重要道场，历史上高僧辈出，对浙东佛教发展影响深远。寺内保存的佛教文物和碑刻，是研究唐代以来佛教史的重要资料。作为浙东四大丛林之一，七塔寺至今仍是宁波最重要的佛教活动场所，在信众中具有崇高地位。" },
+                { name: "城隍庙", type: "庙宇", dynasty: "明代", year: "1371年", location: "江厦街", locationDetail: "位于海曙区江厦街道县学街22号，紧邻江厦公园。庙坐北朝南，占地面积约6000平方米，主要建筑沿中轴线分布，是宁波老城区重要的道教活动场所。", desc: "宁波府城隍庙，道教活动场所", detail: "宁波府城隍庙始建于明洪武四年（1371年），是宁波最大的城隍庙。庙内供奉城隍神，是道教在宁波的重要活动场所。", value: "宁波府城隍庙是宁波规模最大、历史最悠久的城隍庙，也是浙东地区重要的道教宫观。庙宇建筑宏伟，雕刻精美，是研究明代建筑和道教文化的珍贵实例。历史上，城隍庙周边形成了繁华的庙会文化，是宁波传统民俗的重要载体。现为宁波市级文物保护单位。" }
+            ],
+            figures: [
+                { name: "张苍水", dynasty: "明代", years: "1620-1664", title: "兵部尚书", desc: "明末抗清英雄，坚持抗清十九年，宁死不屈", detail: "张苍水（1620-1664），名煌言，字玄著，号苍水，浙江鄞县人。南明兵部尚书，坚持抗清斗争十九年，与郑成功联合抗清，曾率部攻入长江，震动东南。1664年被俘，宁死不屈，英勇就义于杭州。", evaluation: "张苍水是明末抗清斗争中最杰出的将领之一，与郑成功并称'东南双柱'。其诗文气节凛然，《张苍水集》为后世传诵。乾隆年间被追谥为'忠烈'，入祀昭忠祠。其'宁为玉碎，不为瓦全'的气节，成为中华民族精神的象征。", connection: "张苍水为宁波鄞县人，生于斯长于斯。其故居遗址位于今宁波海曙区，原址立有纪念碑。宁波城中的苍水街即以其名命名，以纪念这位民族英雄。张氏家族为宁波望族，在当地有深远影响。" },
+                { name: "范钦", dynasty: "明代", years: "1506-1585", title: "兵部右侍郎", desc: "天一阁创建者，著名藏书家", detail: "范钦（1506-1585），字尧卿，号东明，浙江鄞县人。明嘉靖年间进士，官至兵部右侍郎。范钦酷爱藏书，辞官归里后在月湖创建天一阁，是中国古代最著名的藏书家之一。", evaluation: "范钦是中国古代藏书事业的集大成者，其创建的天一阁保存了中国最珍贵的典籍。他创立的'代不分书，书不出阁'的藏书制度，保证了天一阁藏书的安全传承。天一阁的建筑布局和防火措施，成为后世藏书楼建设的典范。", connection: "范钦为宁波鄞县人，一生与宁波紧密相连。辞官归里后，在月湖西岸创建天一阁，奠定了宁波'浙东邹鲁'的文化地位。范氏后代世代守护天一阁，使这一文化瑰宝得以保存至今。天一阁已成为宁波最重要的文化地标。" },
+                { name: "王安石", dynasty: "北宋", years: "1021-1086", title: "鄞县知县", desc: "政治家、文学家，曾任鄞县知县，兴修水利", detail: "王安石（1021-1086），字介甫，号半山，江西临川人。北宋著名政治家、文学家、思想家。1047年任鄞县知县，在任期间兴修水利，创办县学，政绩卓著。", evaluation: "王安石是中国历史上最具影响力的改革家之一，其'熙宁变法'虽以失败告终，但其改革精神影响深远。作为文学家，王安石位列'唐宋八大家'，其诗文雄浑有力，别具一格。其政治思想和文学成就，在中国历史上占有重要地位。", connection: "1047年，27岁的王安石任鄞县知县，在任三年间，兴修水利，疏浚东钱湖，创办县学，政绩卓著。他在鄞县的施政实践，成为其日后变法的试验田。离任后仍心系鄞县，多次回访。鄞县人民感其功德，至今传颂。" },
+                { name: "黄宗羲", dynasty: "明清", years: "1610-1695", title: "思想家", desc: "思想家、史学家，浙东学派代表，明夷待访录作者", detail: "黄宗羲（1610-1695），字太冲，号梨洲，浙江余姚人。明清之际著名思想家、史学家，浙东学派的代表人物。著有《明夷待访录》《明儒学案》等，提出'天下为主，君为客'的思想。", evaluation: "黄宗羲是中国早期启蒙思想的先驱，其'天下为主，君为客'的思想比卢梭的民权论早了近百年。《明夷待访录》被视为中国最早的启蒙著作。作为史学家，他开创了学案体的史学体裁，《明儒学案》为后世研究明代思想史的必读书。", connection: "黄宗羲为浙东余姚人，与宁波地域相邻，同属浙东文化圈。他在宁波讲学多年，弟子遍布浙东，对宁波文化影响深远。其思想通过浙东学派在宁波传播，成为宁波人文精神的重要组成部分。全祖望等宁波学者均受其影响。" },
+                { name: "全祖望", dynasty: "清代", years: "1705-1755", title: "史学家", desc: "史学家、文学家，浙东学派重要人物", detail: "全祖望（1705-1755），字绍衣，号谢山，浙江鄞县人。清代著名史学家、文学家，浙东学派的重要人物。乾隆元年进士，曾任翰林院庶吉士。著有《鲒埼亭集》《宋元学案》等。", evaluation: "全祖望是清代最杰出的史学家之一，以搜集整理南明史料著称。他秉承黄宗羲的学术传统，撰写了大量有关浙东历史人物的碑传，保存了大量珍贵的历史资料。其《水经注》研究开创了新的学术领域，被誉为清代'郦学'的开山祖师。", connection: "全祖望为宁波鄞县人，生于书香门第。一生致力于浙东历史文化的研究和传播，是浙东学派在清代的重要传人。他在宁波讲学多年，培养了大批学生。其故居位于今宁波海曙区，是宁波重要的历史文化遗迹。" },
+                { name: "袁枚", dynasty: "清代", years: "1716-1797", title: "文学家", desc: "诗人、散文家，性灵派代表", detail: "袁枚（1716-1797），字子才，号简斋，浙江钱塘人。清代著名诗人、散文家，性灵派代表人物。曾任江宁知县，后隐居随园。著有《小仓山房诗文集》《随园诗话》等。", evaluation: "袁枚是清代最具影响力的诗人之一，其'性灵说'主张诗文应抒发真情实感，反对拟古主义，开创了清代诗歌的新风。其《随园诗话》是中国古代最著名的诗话著作之一，对后世诗歌创作和评论影响深远。", connection: "袁枚与宁波有深厚渊源，曾多次游历宁波，并在月湖周边留下诗篇。他对天一阁藏书推崇备至，与范氏后人交往密切。其《随园诗话》中记载了多位宁波文人的诗作，为研究清代宁波文学提供了珍贵资料。" }
+            ],
+            timeline: [
+                { dynasty: "唐代", year: "695年", title: "天封塔始建", desc: "武则天时期建塔保存佛舍利，成为宁波地标" },
+                { dynasty: "唐代", year: "821年", title: "明州筑城", desc: "韩察筑子城，奠定宁波城市基础，鼓楼始建" },
+                { dynasty: "唐代", year: "823年", title: "灵桥始建", desc: "原址建造浮桥，连接鄞奉两县，成为交通要道" },
+                { dynasty: "唐代", year: "858年", title: "七塔寺创建", desc: "浙东四大丛林之一，佛教在宁波兴盛的标志" },
+                { dynasty: "北宋", year: "1047年", title: "王安石治鄞", desc: "王安石任鄞县知县，兴修水利，创办县学，政绩卓著" },
+                { dynasty: "明代", year: "1561年", title: "天一阁创建", desc: "范钦辞官归里，在月湖创建天一阁，成为中国最古老藏书楼" },
+                { dynasty: "明代", year: "1664年", title: "张苍水就义", desc: "张苍水在杭州就义，宁死不屈，英勇殉国" },
+                { dynasty: "1936年", year: "1936年", title: "灵桥改建", desc: "建成钢桥，由德国工程师设计，成为宁波近代化标志" }
+            ]
+        };
+
+        var currentTab = 'home';
+
+        function init() {
+            initTabs();
+            initTree();
+            showHome();
+        }
+
+        function initTabs() {
+            var tabs = document.querySelectorAll('.nav-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].addEventListener('click', function() {
+                    var allTabs = document.querySelectorAll('.nav-tab');
+                    for (var j = 0; j < allTabs.length; j++) {
+                        allTabs[j].classList.remove('active');
+                    }
+                    this.classList.add('active');
+                    currentTab = this.getAttribute('data-tab');
+                    switch(currentTab) {
+                        case 'home': showHome(); break;
+                        case 'streets': showStreets(); break;
+                        case 'buildings': showBuildings(); break;
+                        case 'figures': showFigures(); break;
+                        case 'timeline': showTimeline(); break;
+                    }
+                });
+            }
+        }
+
+        function initTree() {
+            var menu = document.getElementById('treeMenu');
+            var html = '';
+
+            for (var regionName in knowledgeBase.regions) {
+                var region = knowledgeBase.regions[regionName];
+                html += '<div class="tree-section">';
+                html += '<div class="tree-header" onclick="toggleTree(this)">';
+                html += '<span class="tree-icon">' + region.icon + '</span>';
+                html += '<span class="tree-title">' + regionName + '</span>';
+                html += '<span class="tree-count">' + region.streets.length + '条</span>';
+                html += '<span class="tree-arrow">▶</span>';
+                html += '</div>';
+                html += '<div class="tree-children">';
+                for (var i = 0; i < region.streets.length; i++) {
+                    var s = region.streets[i];
+                    var selectedClass = s.highlight ? 'selected' : '';
+                    var star = s.highlight ? '<span style="color:#8b2323;margin-left:auto;">★</span>' : '';
+                    html += '<div class="tree-item ' + selectedClass + '" onclick="showStreetDetail(\'' + s.name + '\', \'' + regionName + '\')">';
+                    html += '<span>📍 ' + s.name + '</span>' + star;
+                    html += '</div>';
+                }
+                html += '</div></div>';
+            }
+
+            html += '<div class="tree-section">';
+            html += '<div class="tree-header" onclick="toggleTree(this)">';
+            html += '<span class="tree-icon">🏛️</span>';
+            html += '<span class="tree-title">历史建筑</span>';
+            html += '<span class="tree-count">' + knowledgeBase.buildings.length + '座</span>';
+            html += '<span class="tree-arrow">▶</span>';
+            html += '</div>';
+            html += '<div class="tree-children">';
+            for (var i = 0; i < knowledgeBase.buildings.length; i++) {
+                var b = knowledgeBase.buildings[i];
+                html += '<div class="tree-item" onclick="showBuildingDetail(\'' + b.name + '\')">';
+                html += '<span>🏯 ' + b.name + '</span>';
+                html += '<span class="tree-count" style="margin-left:auto;font-size:0.75em;">' + b.dynasty + '</span>';
+                html += '</div>';
+            }
+            html += '</div></div>';
+
+            html += '<div class="tree-section">';
+            html += '<div class="tree-header" onclick="toggleTree(this)">';
+            html += '<span class="tree-icon">👤</span>';
+            html += '<span class="tree-title">历史人物</span>';
+            html += '<span class="tree-count">' + knowledgeBase.figures.length + '位</span>';
+            html += '<span class="tree-arrow">▶</span>';
+            html += '</div>';
+            html += '<div class="tree-children">';
+            for (var i = 0; i < knowledgeBase.figures.length; i++) {
+                var f = knowledgeBase.figures[i];
+                html += '<div class="tree-item" onclick="showFigureDetail(\'' + f.name + '\')">';
+                html += '<span>🧑 ' + f.name + '</span>';
+                html += '<span class="tree-count" style="margin-left:auto;font-size:0.75em;">' + f.dynasty + '</span>';
+                html += '</div>';
+            }
+            html += '</div></div>';
+
+            menu.innerHTML = html;
+        }
+
+        function toggleTree(header) {
+            header.classList.toggle('expanded');
+            var children = header.nextElementSibling;
+            if (children) {
+                children.classList.toggle('expanded');
+            }
+        }
+
+        // 移动端侧边栏切换
+        function toggleSidebar() {
+            var sidebar = document.getElementById('leftSidebar');
+            var overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function showHome() {
+            var content = document.getElementById('mainContent');
+            var html = '<div class="home-content">';
+
+            html += '<div class="home-intro">';
+            html += '<h2 class="home-title">卷首语</h2>';
+            html += '<p class="home-desc">宁波，古称明州、甬城，是国家历史文化名城，有着七千多年的文明史。城中街巷纵横，每一条街道都承载着厚重的历史，每一座建筑都诉说着古老的故事。本志依据《甬城街巷》一书，整理归纳宁波城中四十余条历史街巷，十八处古建名胜，十余位历史人物。</p>';
+            html += '</div>';
+
+            html += '<div class="classical-quote">';
+            html += '海定则波宁，港通则贸兴。甬城自古为海上丝绸之路的重要起点，商贾云集，人文荟萃。街巷之名，或纪念先贤，或记载史迹，或描绘景致，皆蕴含着深厚的历史文化内涵。';
+            html += '</div>';
+
+            // 区域分类展示（替代原来的舆地图）
+            html += '<h3 style="text-align:center;margin:30px 0 20px;color:var(--indigo);font-size:1.1em;">📍 区域分布</h3>';
+            for (var regionName in knowledgeBase.regions) {
+                var region = knowledgeBase.regions[regionName];
+                html += '<div class="region-section">';
+                html += '<h3>' + region.icon + ' ' + regionName + '</h3>';
+                html += '<p>' + region.desc + '</p>';
+                html += '<div class="region-streets">';
+                for (var i = 0; i < region.streets.length; i++) {
+                    var s = region.streets[i];
+                    html += '<span class="region-street-tag" onclick="showStreetDetail(\'' + s.name + '\', \'' + regionName + '\')">' + s.name + '</span>';
+                }
+                html += '</div></div>';
+            }
+
+            html += '<div class="scroll-decoration">* * *</div>';
+
+            html += '<div class="category-grid">';
+            html += '<div class="category-card" onclick="switchToTab(\'streets\')"><div class="category-icon">📍</div><div class="category-name">街巷考</div><div class="category-count">四十条历史街巷</div></div>';
+            html += '<div class="category-card" onclick="switchToTab(\'buildings\')"><div class="category-icon">🏛️</div><div class="category-name">建筑志</div><div class="category-count">十八处古建名胜</div></div>';
+            html += '<div class="category-card" onclick="switchToTab(\'figures\')"><div class="category-icon">👤</div><div class="category-name">人物传</div><div class="category-count">十余位历史人物</div></div>';
+            html += '<div class="category-card" onclick="switchToTab(\'timeline\')"><div class="category-icon">📜</div><div class="category-name">编年史</div><div class="category-count">千年历史沿革</div></div>';
+            html += '</div></div>';
+
+            content.innerHTML = html;
+
+            // 关闭移动端侧边栏
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showStreets() {
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header">';
+            html += '<div class="chapter-number">卷一</div>';
+            html += '<h2 class="chapter-title">街巷考</h2>';
+            html += '<p class="chapter-subtitle">甬城街巷，纵横交错，各有故事</p>';
+            html += '</div>';
+
+            html += '<div class="content-body">';
+            html += '<p>宁波城中街巷众多，或依水系而建，或因史迹得名，或凭商贸而兴。街巷之名，往往蕴含着深厚的历史文化内涵。有以人名命名者，如苍水街纪念张苍水；有以功能命名者，如药行街因药业聚集而得名；有以景观命名者，如桂花巷因桂花飘香而得名。</p>';
+
+            html += '<div class="info-cards">';
+            html += '<div class="info-card street"><div class="info-card-title">📍 纪念型街巷</div><div class="info-card-content">以历史人物命名，如苍水街纪念张苍水，郎官巷纪念双状元。</div></div>';
+            html += '<div class="info-card building"><div class="info-card-title">🏛️ 功能型街巷</div><div class="info-card-content">因商业聚集而得名，如药行街、江厦街，见证商业繁华。</div></div>';
+            html += '<div class="info-card figure"><div class="info-card-title">👤 景观型街巷</div><div class="info-card-content">因自然风光得名，如桂花巷、烟月街，诗意盎然。</div></div>';
+            html += '<div class="info-card event"><div class="info-card-title">📜 传说型街巷</div><div class="info-card-content">蕴含民间传说，如迎凤街、七千巷，神秘动人。</div></div>';
+            html += '</div>';
+
+            html += '<div class="scroll-decoration">* * *</div>';
+
+            html += '<p>纵观甬城街巷，海曙区为老城区核心，历史最为悠久。中山路、江厦街等商贾云集，见证了宁波的商业繁荣；苍水街、郎官巷等人文荟萃，体现了宁波的文化底蕴。月湖区域更是浙东邹鲁，天一阁藏书天下闻名，柳汀街、翰香坊等街巷书香门第聚集，人文气息浓厚。</p>';
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showBuildings() {
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header"><div class="chapter-number">卷二</div><h2 class="chapter-title">建筑志</h2><p class="chapter-subtitle">亭台楼阁，见证沧桑</p></div>';
+
+            html += '<div class="content-body">';
+            html += '<p>宁波古建筑遗存丰富，从唐代的佛塔、宋代的桥梁，到明代的藏书楼、清代的庙宇，构成了完整的历史建筑序列。这些建筑不仅是城市的地标，更是历史的见证，承载着丰富的文化内涵。</p>';
+
+            html += '<div class="classical-quote">';
+            html += '天一生水，地六成之。范钦建阁，藏书天下。四百余年，岿然独存，实乃中华文明之瑰宝。';
+            html += '</div>';
+
+            for (var i = 0; i < knowledgeBase.buildings.length; i++) {
+                var b = knowledgeBase.buildings[i];
+                html += '<div class="info-card building" style="margin:15px 0;" onclick="showBuildingDetail(\'' + b.name + '\')">';
+                html += '<div class="info-card-title">🏯 ' + b.name + ' <span style="font-size:0.85em;color:#666;margin-left:10px;">' + b.dynasty + ' · ' + b.year + '</span></div>';
+                html += '<div class="info-card-content">' + b.desc + '，位于' + b.location + '。</div>';
+                html += '</div>';
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showFigures() {
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header"><div class="chapter-number">卷三</div><h2 class="chapter-title">人物传</h2><p class="chapter-subtitle">人杰地灵，英才辈出</p></div>';
+
+            html += '<div class="content-body">';
+            html += '<p>宁波自古人文荟萃，历代先贤在此留下足迹。从政坛巨擘到学界泰斗，从抗敌英雄到文化名流，这些人物或与甬城有深厚渊源，或在此留下不朽功绩。</p>';
+
+            html += '<div class="classical-quote">';
+            html += '浙东邹鲁，文献之邦。自宋以来，人才辈出，学派林立。明州之学，源远流长。';
+            html += '</div>';
+
+            for (var i = 0; i < knowledgeBase.figures.length; i++) {
+                var f = knowledgeBase.figures[i];
+                html += '<div class="figure-card" onclick="showFigureDetail(\'' + f.name + '\')">';
+                html += '<div class="figure-avatar">' + f.name[0] + '</div>';
+                html += '<div class="figure-info">';
+                html += '<h4>' + f.name + '</h4>';
+                html += '<span class="figure-dynasty">' + f.dynasty + ' · ' + f.years + '</span>';
+                html += '<p class="figure-desc">' + f.title + '。' + f.desc + '</p>';
+                html += '</div></div>';
+            }
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showTimeline() {
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header"><div class="chapter-number">卷四</div><h2 class="chapter-title">编年史</h2><p class="chapter-subtitle">千年沧桑，岁月留痕</p></div>';
+
+            html += '<div class="content-body">';
+            html += '<p>宁波历史源远流长，七千年前河姆渡文化在此发祥。唐长庆元年（821年）建城，此后一千余年，城市虽有兴废，但文脉绵延不绝。</p>';
+
+            html += '<div class="timeline">';
+            for (var i = 0; i < knowledgeBase.timeline.length; i++) {
+                var item = knowledgeBase.timeline[i];
+                html += '<div class="timeline-item">';
+                html += '<div class="timeline-date">' + item.year + '<br><span class="dynasty">' + item.dynasty + '</span></div>';
+                html += '<div class="timeline-content">';
+                html += '<div class="timeline-title">' + item.title + '</div>';
+                html += '<div class="timeline-desc">' + item.desc + '</div>';
+                html += '</div></div>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showStreetDetail(name, region) {
+            var regionData = knowledgeBase.regions[region];
+            var street = null;
+            for (var i = 0; i < regionData.streets.length; i++) {
+                if (regionData.streets[i].name === name) {
+                    street = regionData.streets[i];
+                    break;
+                }
+            }
+
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header">';
+            html += '<div class="chapter-number">街巷考 · ' + region + '</div>';
+            html += '<h2 class="chapter-title">' + name + '</h2>';
+            html += '<p class="chapter-subtitle">' + street.desc + '</p>';
+            html += '</div>';
+
+            html += '<div class="content-body">';
+
+            html += '<div class="detail-section">';
+            html += '<h4>📍 地理位置</h4>';
+            if (street.location) {
+                html += '<p>' + street.location + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>📖 名称由来</h4>';
+            html += '<p>' + street.detail + '</p>';
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>🏛️ 历史沿革</h4>';
+            if (street.history) {
+                html += '<p>' + street.history + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>🎯 现状与价值</h4>';
+            if (street.value) {
+                html += '<p>' + street.value + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="page-reference">';
+            html += '详见原书第 ' + street.pages + ' 页';
+            html += '</div>';
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            document.getElementById('mainContent').scrollTop = 0;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showBuildingDetail(name) {
+            var building = null;
+            for (var i = 0; i < knowledgeBase.buildings.length; i++) {
+                if (knowledgeBase.buildings[i].name === name) {
+                    building = knowledgeBase.buildings[i];
+                    break;
+                }
+            }
+
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header">';
+            html += '<div class="chapter-number">建筑志 · ' + building.dynasty + '</div>';
+            html += '<h2 class="chapter-title">' + name + '</h2>';
+            html += '<p class="chapter-subtitle">' + building.type + ' · ' + building.year + '</p>';
+            html += '</div>';
+
+            html += '<div class="content-body">';
+
+            html += '<div class="detail-section">';
+            html += '<h4>🏛️ 建筑简介</h4>';
+            html += '<p>' + building.detail + '</p>';
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>📍 地理位置</h4>';
+            if (building.locationDetail) {
+                html += '<p>' + building.locationDetail + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>⭐ 历史价值</h4>';
+            if (building.value) {
+                html += '<p>' + building.value + '</p>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            document.getElementById('mainContent').scrollTop = 0;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function showFigureDetail(name) {
+            var figure = null;
+            for (var i = 0; i < knowledgeBase.figures.length; i++) {
+                if (knowledgeBase.figures[i].name === name) {
+                    figure = knowledgeBase.figures[i];
+                    break;
+                }
+            }
+
+            var content = document.getElementById('mainContent');
+            var html = '<div class="chapter-header">';
+            html += '<div class="chapter-number">人物传 · ' + figure.dynasty + '</div>';
+            html += '<h2 class="chapter-title">' + name + '</h2>';
+            html += '<p class="chapter-subtitle">' + figure.title + ' · ' + figure.years + '</p>';
+            html += '</div>';
+
+            html += '<div class="content-body">';
+
+            html += '<div class="detail-section">';
+            html += '<h4>👤 生平简介</h4>';
+            html += '<p>' + figure.detail + '</p>';
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>📜 历史评价</h4>';
+            if (figure.evaluation) {
+                html += '<p>' + figure.evaluation + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div class="detail-section">';
+            html += '<h4>🎯 与甬城渊源</h4>';
+            if (figure.connection) {
+                html += '<p>' + figure.connection + '</p>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+            content.innerHTML = html;
+
+            document.getElementById('mainContent').scrollTop = 0;
+
+            var sidebar = document.getElementById('leftSidebar');
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        }
+
+        function switchToTab(tab) {
+            var allTabs = document.querySelectorAll('.nav-tab');
+            for (var i = 0; i < allTabs.length; i++) {
+                allTabs[i].classList.remove('active');
+                if (allTabs[i].getAttribute('data-tab') === tab) {
+                    allTabs[i].classList.add('active');
+                }
+            }
+            currentTab = tab;
+            switch(tab) {
+                case 'streets': showStreets(); break;
+                case 'buildings': showBuildings(); break;
+                case 'figures': showFigures(); break;
+                case 'timeline': showTimeline(); break;
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
